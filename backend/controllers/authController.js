@@ -64,6 +64,7 @@ export const register = async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 };
+
 // Login controller
 export const login = async (req, res) => {
   // get body request
@@ -120,9 +121,53 @@ export const login = async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 };
+
 // Logout controller
 export const logout = async (req, res) => {
   // clear cookie
   res.clearCookie("accessToken");
   res.json({ message: "Logged out successfully" });
+};
+
+export const getProfile = async (req, res) => {
+  try {
+    // get user data collection
+    const user = await User.findById(req.user._id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // send response user profile
+    res.send(user.profile);
+  } catch (error) {
+    console.error("Error in getProfile controller: " + error.message);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  const { id } = req.params;
+  const { avatar, bio } = req.body;
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      id,
+      {
+        "profile.avatar": avatar,
+        "profile.bio": bio,
+        updatedAt: Date.now(),
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.send(user.profile);
+  } catch (error) {}
 };
