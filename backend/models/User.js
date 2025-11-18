@@ -4,19 +4,18 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Name is required"],
+      required: true,
     },
     email: {
       type: String,
-      required: [true, "Email is required"],
+      required: true,
       unique: true, // email must be unique
       lowercase: true, // lowercase must be lowercase
       trim: true,
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
-      minLength: [6, "Password must be at least 6 characters"], // pasword length must be 6 characters
+      required: true,
     },
     role: {
       type: String,
@@ -30,11 +29,12 @@ const userSchema = new mongoose.Schema(
       },
       bio: {
         type: String,
+        default: "",
         maxLength: [500, "Bio must not exceed 500 characters"],
       },
     },
   },
-  { timestamps }
+  { timestamps: true }
 );
 
 const User = mongoose.model("User", userSchema);
