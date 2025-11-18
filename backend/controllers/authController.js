@@ -2,6 +2,8 @@ import bcrypt from "bcryptjs";
 
 import User from "../models/User.js";
 import emailValidator from "../libraries/emailValidator.js";
+import generateAccessToken from "../libraries/generateAccessToken.js";
+import setCookie from "../libraries/setCookie.js";
 
 // Register controller
 export const register = async (req, res) => {
@@ -21,11 +23,10 @@ export const register = async (req, res) => {
     const isEmailValid = emailValidator(email);
 
     if (!isEmailValid) {
-      return res.status(400).json({ message: "Invalid email address" });
+      return res.status(400).json({ message: "Invalid format email address" });
     }
 
     const isEmailExist = await User.findOne({ email });
-    console.log(isEmailExist);
     if (isEmailExist) {
       return res.status(400).json({ message: "Email already exist" });
     }
@@ -42,10 +43,49 @@ export const register = async (req, res) => {
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
     console.error("Error in register controller: " + error.message);
-    res.status(500).json({ message: error.message || "Something went wrong" });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 // Login controller
-export const login = async (req, res) => {};
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  try {
+    const isEmailValid = emailValidator(email);
+
+    if (!isEmailValid) {
+      return res.status(400).json({ message: "Invalid format email address" });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const comparePassword = await bcrypt.compare(password, user.password);
+
+    if (!comparePassword) {
+      return res.status(400).json({ message: "Wrong password" });
+    }
+
+    const accessToken = generateAccessToken(user._id, user.role);
+    setCookie(res, accessToken);
+
+    res.status(200).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    });
+  } catch (error) {
+    console.error("Error in login controller: " + error.message);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
 // Logout controller
 export const logout = async (req, res) => {};
