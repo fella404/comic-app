@@ -107,7 +107,7 @@ export const login = async (req, res) => {
     }
 
     // generate accessToken for secure auth
-    const accessToken = generateAccessToken(user._id, user.role);
+    const accessToken = generateAccessToken(user._id);
     setCookie(res, accessToken);
 
     res.status(200).json({
@@ -163,11 +163,108 @@ export const updateProfile = async (req, res) => {
         runValidators: true,
       }
     );
-    
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
     res.send(user.profile);
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error in updateProfile controller: " + error.message);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  // get id from route params
+  const { id } = req.params;
+  // get data from req body
+  const { currentPassword, newPassword, repeatNewPassword } = req.body;
+
+  // input validator
+  if (!currentPassword || !newPassword || !repeatNewPassword) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  // check if password less than 6 characters
+  if (newPassword.length < 6) {
+    return res
+      .status(400)
+      .json({ message: "Password must be at least 6 characters" });
+  }
+
+  try {
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    /**
+     * Check if current password match with new password
+     * return true if password match
+     * return false if password does not match
+     *
+     * Examples
+     * Current Password = 123456 New Password = 123456 // True
+     * Current Password = 123456 New Password = abcdef // False
+     */
+    const isCurrentPasswordMatch = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+
+    if (!isCurrentPasswordMatch) {
+      return res.status(400).json({ message: "Current password is incorrect" });
+    }
+
+    /**
+     * Check if new password match with repeat new password
+     * return true if password match
+     * return false if password does not match
+     *
+     * Examples
+     * New Password = 123456 Repeat New Password = 123456 // True
+     * New Password = 123456 Repeat New Password = abcdef // False
+     */
+    if (newPassword !== repeatNewPassword) {
+      return res.status(400).json({ message: "New password does not match" });
+    }
+
+    /**
+     * Check if new password same with current password
+     * return true if password match // error
+     * return false if password does not match // continue
+     *
+     * Examples
+     * New Password = 123456 Current Password = 123456 // True
+     * New Password = 123456 Current Password = abcdef // False
+     */
+    const isSameAsCurrent = await bcrypt.compare(newPassword, user.password);
+
+    if (isSameAsCurrent) {
+      return res.status(400).json({
+        message: "New password must be different from current password",
+      });
+    }
+
+    // Hashing password
+    const salt = await bcrypt.genSalt(10);
+    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+    // generate token for secure auth
+    const accessToken = generateAccessToken(user._id);
+
+    // renew password on db
+    user.password = hashedNewPassword;
+    await user.save();
+
+    // set cookie on client
+    setCookie(res, accessToken);
+
+    res.json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error("Error in changePassword controller: " + error.message);
+    res.status(500).json({ message: "Something went wrong" });
+  }
 };
