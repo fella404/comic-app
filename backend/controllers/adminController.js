@@ -46,7 +46,7 @@ export const updateUser = async (req, res) => {
       body, // new data
       { new: true, runValidators: true }
     );
-    
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -63,11 +63,11 @@ export const deleteUser = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // find user by id and delete it
-    const user = await User.findByIdAndDelete(id);
+    /// find user by id and filter by reader role only
+    const user = await User.findOneAndDelete({ _id: id, role: "reader" });
 
     if (!user) {
-      return res.json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
 
     res.json({ message: "User deleted successfully" });
