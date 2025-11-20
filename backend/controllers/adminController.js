@@ -41,12 +41,12 @@ export const updateUser = async (req, res) => {
 
   try {
     // get user by id and update the data
-    const user = await User.findByIdAndUpdate(
-      id, // user id
-      { body }, // new data
+    const user = await User.findOneAndUpdate(
+      { _id: id, role: "reader" }, // find user by id and filter by reader role only
+      body, // new data
       { new: true, runValidators: true }
-    ).select("-password");
-
+    );
+    
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

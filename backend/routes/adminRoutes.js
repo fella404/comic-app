@@ -11,7 +11,7 @@ const router = Router();
 
 router.get("/users", protectedRoute, adminRoute, getUsers);
 router.get("/users/:id", protectedRoute, adminRoute, getUser);
-router.get("/users/:id", protectedRoute, adminRoute, updateUser);
-router.get("/users/:id", protectedRoute, adminRoute, deleteUser);
+router.put("/users/:id", protectedRoute, adminRoute, updateUser);
+router.delete("/users/:id", protectedRoute, adminRoute, deleteUser);
 
 export default router;
