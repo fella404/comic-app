@@ -17,7 +17,14 @@ export const getUser = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const user = await User.findById(id, { role: "reader" });
+    const user = await User.findOne({ _id: id, role: "reader" });
+
+    if (user === null) {
+      return res
+        .status(400)
+        .json({ message: "Cannot get this user information(admin)" });
+    }
+
     res.send(user);
   } catch (error) {
     console.error("Error in getUser controller: " + error.message);
