@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 
 import connectDB from "./libraries/db.js";
 import authRoutes from "./routes/authRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(cookieParser());
 
 // API routes
 app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
 
 // ConnectDB and Running Server
 connectDB().then(() => {
