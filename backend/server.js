@@ -1,6 +1,7 @@
 import cookieParser from "cookie-parser";
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 
 import connectDB from "./libraries/db.js";
 import authRoutes from "./routes/authRoutes.js";
