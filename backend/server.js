@@ -6,6 +6,7 @@ import cors from "cors";
 import connectDB from "./libraries/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import comicRoutes from "./routes/comicRoutes.js";
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use(cookieParser());
 // API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api", comicRoutes);
 
 // ConnectDB and Running Server
 connectDB().then(() => {

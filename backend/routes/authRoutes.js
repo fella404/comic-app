@@ -7,15 +7,15 @@ import {
   register,
   updateProfile,
 } from "../controllers/authController.js";
-import { adminRoute, protectedRoute } from "../middlewares/authMiddleware.js";
+import { protectedRoute } from "../middlewares/authMiddleware.js";
 
 const router = Router();
 
 router.post("/register", register);
 router.post("/login", login);
-router.post("/logout", logout);
-router.get("/profile", protectedRoute, adminRoute, getProfile);
-router.put("/profile/:id", protectedRoute, adminRoute, updateProfile);
+router.post("/logout", protectedRoute, logout);
+router.get("/profile", protectedRoute, getProfile);
+router.put("/profile/:id", protectedRoute, updateProfile);
 router.post("/change-password/:id", protectedRoute, changePassword);
 
 export default router;
