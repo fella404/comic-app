@@ -5,9 +5,9 @@ export const addComic = async (req, res) => {
 
   // input validator
   if (!title || !description || !coverImage || !author) {
-    return res
-      .status(400)
-      .json({ message: "Title, description, and author are required" });
+    return res.status(400).json({
+      message: "Title, description, coverImage and author are required",
+    });
   }
 
   try {
@@ -27,6 +27,38 @@ export const addComic = async (req, res) => {
     res.status(201).send(comic);
   } catch (error) {
     console.error("Error in addComic controller: " + error.message);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const getComics = async (req, res) => {
+  try {
+    const comic = await Comic.find();
+
+    if (!comic) {
+      return res.status(400).json({ message: "Failed to get comics" });
+    }
+
+    res.send(comic);
+  } catch (error) {
+    console.error("Error in getComics controller: " + error.message);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const getComic = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const comic = await Comic.findById(id);
+
+    if (!comic) {
+      return res.status(400).json({ message: "Failed to get comics" });
+    }
+
+    res.send(comic);
+  } catch (error) {
+    console.error("Error in getComics controller: " + error.message);
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
