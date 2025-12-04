@@ -4,8 +4,8 @@ import { ThemeToggle } from "./theme-toggle";
 
 export function Navbar() {
   return (
-    <header className="w-full sticky top-0 z-50 backdrop-blur bg-background/70 border-b">
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
+    <header className="w-full sticky top-0 z-50 backdrop-blur bg-background/70 p-3  ">
+      <div className="w-full flex items-center justify-between px-4 py-3 rounded-2xl shadow">
         <Link href="/" className="font-bold text-lg flex items-center gap-2">
           <span className="text-blue-500 text-xl">★</span> IN-KOMIK
         </Link>
